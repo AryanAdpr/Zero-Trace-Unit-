@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zero Trace Unit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --fg: #ffffff;
+      --muted: #c8c8c8;
+      --accent: #7df9ff; /* cyber-cyan */
+      --glass: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.10);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      line-height: 1.65;
+      display: grid;
+      place-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Subtle animated grid background */
+    .grid-bg::before {
+      content: "";
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(60vmax 60vmax at 120% -10%, rgba(125,249,255,0.08), transparent 60%),
+        radial-gradient(50vmax 50vmax at -20% 110%, rgba(125,249,255,0.06), transparent 60%),
+        linear-gradient(transparent 95%, rgba(125,249,255,0.15) 100%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 120px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 120px);
+      filter: saturate(110%);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 18s linear infinite;
+    }
+    @keyframes drift { to { transform: translate3d(-2%, -2%, 0); } }
+
+    /* Scanline shimmer */
+    .scanlines::after {
+      content: "";
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main {
+      width: min(1100px, 92vw);
+      margin: 8vh auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: clamp(1.5rem, 3vw, 3rem);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 20px 80px rgba(0,0,0,0.6),
+        0 0 80px rgba(125,249,255,0.08) inset;
+      backdrop-filter: blur(8px);
+    }
+
+    .title {
+      display: inline-flex;
+      align-items: center;
+      gap: .8rem;
+      margin: 0 0 .5rem 0;
+      font-family: 'Orbitron', system-ui, sans-serif; 
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #ffffff; /* strict white per request */
+      text-shadow:
+        0 0 8px rgba(255,255,255,0.45),
+        0 0 32px rgba(125,249,255,0.35);
+      position: relative;
+    }
+
+    .title .beacon {
+      width: .6em; height: .6em; border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { transform: scale(.7); opacity: .65 } 50% { transform: scale(1); opacity: 1 } }
+
+    .tagline {
+      margin: 0 0 1.25rem 0;
+      font-size: clamp(.85rem, 1.4vw, 1rem);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      opacity: .75;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      margin: 1.25rem 0 1.75rem;
+    }
+
+    .content {
+      font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+      color: var(--muted);
+      max-width: 70ch;
+    }
+
+    .content strong { color: #ffffff; }
+
+    .meta {
+      margin-top: 2rem;
+      display: flex; flex-wrap: wrap; gap: .75rem 1rem;
+      opacity: .75; font-size: .95rem;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: .45rem .9rem;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(4px);
+    }
+
+    .footer { 
+      margin-top: 2rem; 
+      font-size: .95rem; 
+      opacity: .65;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Glitch hover for the title (subtle, accessible) */
+    .title:hover { animation: glitch 700ms steps(22, end) 1; }
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 var(--accent), -2px 0 rgba(255,0,128,0.6), 0 0 32px rgba(125,249,255,0.3); }
+      40% { text-shadow: -2px 0 var(--accent), 2px 0 rgba(255,0,128,0.6), 0 0 24px rgba(125,249,255,0.4); }
+      60% { text-shadow: 3px 0 var(--accent), -3px 0 rgba(255,0,128,0.6), 0 0 28px rgba(125,249,255,0.35);} 
+      100% { text-shadow: 0 0 8px rgba(255,255,255,0.45), 0 0 32px rgba(125,249,255,0.35); }
+    }
+
+    /* Responsive niceties */
+    @media (max-width: 480px) {
+      .meta { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    }
+  </style>
+</head>
+<body class="grid-bg scanlines">
+  <main>
+    <article class="card" aria-label="Zero Trace Unit introduction">
+      <h1 class="title"><span class="beacon" aria-hidden="true"></span> Zero Trace Unit</h1>
+      <p class="tagline">Anonymous • Ethical • Community‑First</p>
+      <div class="divider" role="presentation"></div>
+
+      <section class="content">
+        <p>
+          <strong>Zero Trace Unit (ZTU)</strong> is an independent, privacy‑driven collective of cyber professionals. We operate anonymously, but our mission is public: to strengthen the safety and resilience of online communities.
+        </p>
+        <p>
+          We <em>educate</em> users on digital hygiene, <em>research</em> and responsibly disclose threats, and <em>support</em> platforms and moderators in limiting harassment, fraud, and coordinated toxicity. Our focus is on reducing the reach of toxic actors and harmful behaviors while upholding ethics and the law.
+        </p>
+        <p>
+          We do not chase fame or visibility. We believe true impact leaves no footprint—only a healthier, more respectful internet.
+        </p>
+      </section>
+
+      <div class="meta" aria-label="principles">
+        <span class="chip">Privacy by default</span>
+        <span class="chip">Ethical operations</span>
+        <span class="chip">Community safety</span>
+        <span class="chip">No hype, just impact</span>
+      </div>
+
+      <footer class="footer" aria-label="footer">
+        <span>© <span id="year"></span> Zero Trace Unit • All rights reserved</span>
+      </footer>
+    </article>
+  </main>
+
+  <script>
+    // Set current year without external libraries
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
